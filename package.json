@@ -1,0 +1,54 @@
+{
+  "name": "ai-backend",
+  "version": "1.0.0",
+  "description": "NestJS backend for AI-integrated app (chat, vision, news agent) using LangChain + Gemini",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "nest build",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "start": "nest start",
+    "start:dev": "nest start --watch",
+    "start:debug": "nest start --debug --watch",
+    "start:prod": "node dist/main",
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix"
+  },
+  "dependencies": {
+    "@langchain/core": "^1.2.11",
+    "@langchain/google-genai": "^2.3.2",
+    "@nestjs/common": "^11.2.3",
+    "@nestjs/config": "^12.0.0",
+    "@nestjs/core": "^11.2.3",
+    "@nestjs/jwt": "^11.0.2",
+    "@nestjs/mongoose": "^11.0.4",
+    "@nestjs/passport": "^11.0.5",
+    "@nestjs/platform-express": "^11.2.3",
+    "@nestjs/throttler": "^6.5.0",
+    "bcryptjs": "^3.0.3",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.15.1",
+    "langchain": "^1.5.11",
+    "mongoose": "^9.10.0",
+    "multer": "^2.3.0",
+    "passport": "^0.7.0",
+    "passport-jwt": "^4.0.1",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2",
+    "uuid": "^14.0.2",
+    "zod": "^4.6.4"
+  },
+  "overrides": {
+    "multer": "^2.3.0"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^11.0.24",
+    "@nestjs/schematics": "^11.1.0",
+    "@nestjs/testing": "^11.2.3",
+    "@types/express": "^5.0.6",
+    "@types/multer": "^2.2.0",
+    "@types/node": "^22.20.2",
+    "@types/passport-jwt": "^4.0.1",
+    "typescript": "^5.9.3"
+  }
+}
