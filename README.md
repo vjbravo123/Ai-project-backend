@@ -97,6 +97,15 @@ REVISION_REMINDER_CRON=*/10 * * * *    # how often the reminder sweep runs
 
 ## 4. Run
 
+> **A packaging note on `@nestjs/schedule`**: this project compiles to
+> CommonJS (Nest's default). `@nestjs/schedule@12.x` ships as ESM-only
+> (`"type": "module"`, no CJS build), which crashes a CJS app at boot with
+> `ERR_REQUIRE_ESM`. `package.json` pins `@nestjs/schedule` to `^6.1.3` — the
+> latest release that's still CJS and peer-compatible with NestJS 11 — on
+> purpose. Don't `npm update` past that major without checking it's shipped a
+> CJS build (or migrating the whole project to ESM) first.
+
+
 ```bash
 npm run start:dev     # watch mode
 npm run build && npm run start:prod   # production
