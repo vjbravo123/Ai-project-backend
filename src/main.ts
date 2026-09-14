@@ -36,7 +36,10 @@ async function bootstrap() {
 
   const port = config.get<number>('PORT') ?? 3000;
   await app.listen(port);
-  Logger.log(`🚀 Server running on http://localhost:${port}/api/v1`, 'Bootstrap');
+  Logger.log(
+    `🚀 Server running on http://localhost:${port}/api/v1`,
+    'Bootstrap',
+  );
 }
 
-bootstrap();
+void bootstrap();

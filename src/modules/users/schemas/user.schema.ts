@@ -15,6 +15,22 @@ export class User {
 
   @Prop({ trim: true })
   name?: string;
+
+  // --- Email verification (OTP via Resend) ---
+  @Prop({ default: false })
+  isVerified: boolean;
+
+  @Prop()
+  otpHash?: string;
+
+  @Prop()
+  otpExpiresAt?: Date;
+
+  @Prop({ default: 0 })
+  otpAttempts: number;
+
+  @Prop()
+  otpLastSentAt?: Date;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

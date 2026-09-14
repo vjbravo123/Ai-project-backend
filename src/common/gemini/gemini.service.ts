@@ -22,6 +22,7 @@ export class GeminiService {
   private readonly chatModel: ChatGoogleGenerativeAI;
   private readonly visionModel: ChatGoogleGenerativeAI;
   private readonly structuredModel: ChatGoogleGenerativeAI;
+  private readonly multimodalStructuredModel: ChatGoogleGenerativeAI;
 
   constructor(private readonly config: ConfigService) {
     const apiKey = this.config.get<string>('GEMINI_API_KEY');
@@ -58,6 +59,16 @@ export class GeminiService {
       model: chatModelName,
       temperature: 0.4,
       maxOutputTokens: 8192,
+    });
+
+    // Structured output on top of the vision-capable model — used by the
+    // revision module to transcribe spoken study sessions (audio input)
+    // and/or analyze typed study notes in a single multimodal call.
+    this.multimodalStructuredModel = new ChatGoogleGenerativeAI({
+      apiKey,
+      model: visionModelName,
+      temperature: 0.3,
+      maxOutputTokens: 2048,
     });
   }
 
@@ -127,7 +138,8 @@ export class GeminiService {
     );
 
     const messages: BaseMessage[] = [];
-    if (params.systemPrompt) messages.push(new SystemMessage(params.systemPrompt));
+    if (params.systemPrompt)
+      messages.push(new SystemMessage(params.systemPrompt));
     messages.push(new HumanMessage(params.prompt));
 
     try {
@@ -171,11 +183,54 @@ export class GeminiService {
     }
   }
 
+  /**
+   * Powers the revision-reminder module: give it either spoken audio
+   * (base64, e.g. recorded in the frontend) and/or typed text describing
+   * what the user just studied, plus a zod schema, and get back a typed,
+   * structured analysis (transcript, topic, summary, understanding score,
+   * ...). When audio is provided, Gemini transcribes it AND analyzes it
+   * in the same call — no separate speech-to-text step needed.
+   */
+  async analyzeStudyInput<T extends z.ZodTypeAny>(params: {
+    instructionText: string;
+    schema: T;
+    audio?: { base64: string; mimeType: string };
+  }): Promise<z.infer<T>> {
+    const content = params.audio
+      ? [
+          { type: 'text' as const, text: params.instructionText },
+          {
+            type: 'audio' as const,
+            mimeType: params.audio.mimeType,
+            data: params.audio.base64,
+          },
+        ]
+      : [{ type: 'text' as const, text: params.instructionText }];
+
+    const baseModel = params.audio
+      ? this.multimodalStructuredModel
+      : this.structuredModel;
+    const structuredModel = baseModel.withStructuredOutput(
+      params.schema as z.ZodType<Record<string, any>>,
+    );
+
+    const message = new HumanMessage({ content });
+
+    try {
+      return (await structuredModel.invoke([message])) as z.infer<T>;
+    } catch (err) {
+      this.logger.error('Gemini study-input analysis failed', err as Error);
+      throw err;
+    }
+  }
+
   private extractText(content: unknown): string {
     if (typeof content === 'string') return content;
     if (Array.isArray(content)) {
       return content
-        .map((part: any) => (typeof part === 'string' ? part : part?.text ?? ''))
+        .map((part: any) =>
+          typeof part === 'string' ? part : (part?.text ?? ''),
+        )
         .join('')
         .trim();
     }

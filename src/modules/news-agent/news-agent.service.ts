@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { z } from 'zod';
@@ -60,8 +64,8 @@ export class NewsAgentService {
     const draft = await this.summarizeAndDraft(goal, topic, articles);
 
     // 3. Act: render final Markdown + HTML newsletter
-    const markdown = this.renderMarkdown(draft, topic);
-    const html = this.renderHtml(draft, topic);
+    const markdown = this.renderMarkdown(draft);
+    const html = this.renderHtml(draft);
 
     // 4. Simulate sending: save to disk instead of hitting a real email API
     const savedPath = await this.simulateSend(draft.subject, markdown);
@@ -109,15 +113,18 @@ ${articleList}
     });
   }
 
-  private renderMarkdown(draft: NewsletterDraft, topic: string): string {
+  private renderMarkdown(draft: NewsletterDraft): string {
     const items = draft.items
-      .map((item) => `### ${item.title}\n\n${item.summary}\n\n[Read more](${item.url})`)
+      .map(
+        (item) =>
+          `### ${item.title}\n\n${item.summary}\n\n[Read more](${item.url})`,
+      )
       .join('\n\n');
 
     return `# ${draft.subject}\n\n${draft.intro}\n\n${items}\n\n---\n\n${draft.outro}`;
   }
 
-  private renderHtml(draft: NewsletterDraft, topic: string): string {
+  private renderHtml(draft: NewsletterDraft): string {
     const items = draft.items
       .map(
         (item) => `
@@ -153,7 +160,10 @@ ${articleList}
    * the newsletter to disk and logs the "email" so you can see exactly
    * what would have gone out.
    */
-  private async simulateSend(subject: string, markdown: string): Promise<string> {
+  private async simulateSend(
+    subject: string,
+    markdown: string,
+  ): Promise<string> {
     await fs.mkdir(OUTPUT_DIR, { recursive: true });
 
     const filename = `${Date.now()}-${subject

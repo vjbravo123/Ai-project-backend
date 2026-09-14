@@ -8,7 +8,10 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { CurrentUser, AuthUser } from '../auth/decorators/current-user.decorator';
+import {
+  CurrentUser,
+  AuthUser,
+} from '../auth/decorators/current-user.decorator';
 import { ChatService } from './chat.service';
 import { SendMessageDto } from './dto/send-message.dto';
 
@@ -37,6 +40,10 @@ export class ChatController {
   // Send a message; omit conversationId to start a new conversation
   @Post('message')
   sendMessage(@CurrentUser() user: AuthUser, @Body() dto: SendMessageDto) {
-    return this.chatService.sendMessage(user.userId, dto.message, dto.conversationId);
+    return this.chatService.sendMessage(
+      user.userId,
+      dto.message,
+      dto.conversationId,
+    );
   }
 }

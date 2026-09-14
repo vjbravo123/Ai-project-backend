@@ -10,11 +10,19 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { CurrentUser, AuthUser } from '../auth/decorators/current-user.decorator';
+import {
+  CurrentUser,
+  AuthUser,
+} from '../auth/decorators/current-user.decorator';
 import { VisionService } from './vision.service';
 import { DescribeImageDto } from './dto/describe-image.dto';
 
-const ALLOWED_MIME_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/heic'];
+const ALLOWED_MIME_TYPES = [
+  'image/png',
+  'image/jpeg',
+  'image/webp',
+  'image/heic',
+];
 const MAX_FILE_SIZE_BYTES = 8 * 1024 * 1024; // 8 MB
 
 @UseGuards(JwtAuthGuard)
@@ -34,7 +42,9 @@ export class VisionController {
     @Optional() @Body() dto: DescribeImageDto,
   ) {
     if (!file) {
-      throw new BadRequestException('No image file uploaded (field name: "image")');
+      throw new BadRequestException(
+        'No image file uploaded (field name: "image")',
+      );
     }
     if (!ALLOWED_MIME_TYPES.includes(file.mimetype)) {
       throw new BadRequestException(

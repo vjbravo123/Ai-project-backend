@@ -1,9 +1,16 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { AIMessage, BaseMessage, HumanMessage } from '@langchain/core/messages';
 import { GeminiService } from '../../common/gemini/gemini.service';
-import { Conversation, ConversationDocument } from './schemas/conversation.schema';
+import {
+  Conversation,
+  ConversationDocument,
+} from './schemas/conversation.schema';
 
 const SYSTEM_PROMPT =
   'You are a helpful, concise general-purpose assistant. ' +
@@ -53,7 +60,9 @@ export class ChatService {
     const history: BaseMessage[] = convo.messages
       .slice(-MAX_HISTORY_MESSAGES)
       .map((m) =>
-        m.role === 'human' ? new HumanMessage(m.content) : new AIMessage(m.content),
+        m.role === 'human'
+          ? new HumanMessage(m.content)
+          : new AIMessage(m.content),
       );
 
     const reply = await this.gemini.chat({

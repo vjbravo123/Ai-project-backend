@@ -21,7 +21,8 @@ import { JwtStrategy } from './strategies/jwt.strategy';
           // JWT_EXPIRES_IN is a free-form env string (e.g. "7d"); @nestjs/jwt's
           // types now require the `ms`-style literal union rather than plain
           // string, so we assert the shape instead of hardcoding the value.
-          expiresIn: (config.get<string>('JWT_EXPIRES_IN') ?? '7d') as StringValue,
+          expiresIn: (config.get<string>('JWT_EXPIRES_IN') ??
+            '7d') as StringValue,
         },
       }),
     }),
